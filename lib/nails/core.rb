@@ -1,3 +1,4 @@
+require 'base64'
 require 'digest'
 require 'streamio-ffmpeg'
 require 'rmagick'
@@ -31,7 +32,7 @@ module Nails
     def screenshot(video, count = 12)
       interval = video.duration / count
       seek_start = interval / 2
-      cache_name = Digest::MD5.base64digest(video.path)
+      cache_name = Base64.urlsafe_encode64(Digest::MD5.digest(video.path))
       FileUtils.mkdir(TMP_DIR) unless File.exist?(TMP_DIR)
       count.times.map do |x|
         seek = (seek_start + interval * x).round
