@@ -101,7 +101,7 @@ module Nails
       print '#'
 
       vmeta = video.metadata[:streams].find{ |s| s[:codec_type] == 'video' } rescue {}
-      ameta = video.metadata[:streams].find{ |s| s[:codec_type] == 'audio' } rescue {}
+      audio_streams = video.audio_streams
 
       basename = File.basename(video.path)
       size = File.size(video.path) / 1048576.0
@@ -110,19 +110,19 @@ module Nails
 
       vcodec = codec_format(video.video_codec)
       vprofile = " 10-bit" if vmeta[:profile] =~ /10/
-      acodec = codec_format(video.audio_codec)
+      acodec = audio_streams.map{ |as| codec_format(as[:codec_name]) }.join(' + ')
+      abps = audio_streams.map{ |as| '%.1f kbps' % (as[:bitrate] / 1024.0) }.join(' + ')
+
       w = video.width
       h = video.height
       duration = time_format(video.duration)
       fps = video.frame_rate
       vbps = video.video_bitrate
-      abps = video.audio_bitrate
       if vbps == 0
         vbps = vmeta[:tags][:BPS].to_i rescue 0
-        abps = ameta[:tags][:BPS].to_i rescue 0
       end
       av_bitrate = if vbps > 0
-        '(%.1f kbps + %.1f kbps)' % [vbps / 1024.0, abps / 1024.0]
+        '(%.1f kbps + %s)' % [vbps / 1024.0, abps]
       end
       l2 = '%s%s + %s - %dx%d - %s @ %.3f fps %s' % [vcodec, vprofile, acodec, w, h, duration, fps, av_bitrate]
 
