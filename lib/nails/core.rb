@@ -13,7 +13,7 @@ module Nails
   IMG_BORDER = 1
   IMG_SHADOWX = 5
   IMG_SHADOWY = 3
-  FONT = 'WenQuanYi Micro Hei'
+  FONT = ENV['font'] || 'WenQuanYi-Micro-Hei'
   class Core
     include Magick
 
@@ -81,13 +81,12 @@ module Nails
       #return out.write('test.png')
 
       timestamp = Draw.new
-      timestamp.font = FONT
+      timestamp.font = 'Helvetica-Bold'
       timestamp.gravity = Magick::NorthWestGravity
       timestamp.pointsize = 24
       timestamp.fill = 'black'
       timestamp.font_weight = BoldWeight
       images.each do |image|
-        print '#'
         box = get_box(image[:idx])
         video_pic = Image.read(image[:name]).first
         next unless video_pic
@@ -98,7 +97,6 @@ module Nails
           box[1] * base_height + IMG_PADDINGY + IMG_HEADER + 10,
           timestamp_format(image[:seek]))
       end
-      print '#'
 
       vmeta = video.metadata[:streams].find{ |s| s[:codec_type] == 'video' } rescue {}
       audio_streams = video.audio_streams
@@ -133,7 +131,7 @@ module Nails
       text.annotate(out, video.width - 10, IMG_HEADER / 2, 10, 10, l1)
       text.annotate(out, video.width - 10, IMG_HEADER / 2, 10, IMG_HEADER / 2, l2)
 
-      puts '!'
+      puts "Writing to #{video.path}.jpg"
       out.write("#{video.path}.jpg")
     end
 
