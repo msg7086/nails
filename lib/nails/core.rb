@@ -153,6 +153,7 @@ module Nails
 
     def time_format(sec)
       if sec > 600
+        sec = sec.round
         '%d:%02d:%02d' % [sec / 3600, sec / 60 % 60, sec % 60]
       else
         '%02d:%02d.%03d' % [sec / 60 % 60, sec % 60, (sec * 1000) % 1000]
